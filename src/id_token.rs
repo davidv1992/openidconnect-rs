@@ -216,8 +216,6 @@ where
     nonce: Option<Nonce>,
     #[serde(rename = "acr", skip_serializing_if = "Option::is_none")]
     auth_context_ref: Option<AuthenticationContextClass>,
-    #[serde(rename = "amr", skip_serializing_if = "Option::is_none")]
-    auth_method_refs: Option<Vec<AuthenticationMethodReference>>,
     #[serde(rename = "azp", skip_serializing_if = "Option::is_none")]
     authorized_party: Option<ClientId>,
     #[serde(rename = "at_hash", skip_serializing_if = "Option::is_none")]
@@ -257,7 +255,6 @@ where
             auth_time: None,
             nonce: None,
             auth_context_ref: None,
-            auth_method_refs: None,
             authorized_party: None,
             access_token_hash: None,
             code_hash: None,
@@ -275,7 +272,6 @@ where
             set_auth_time -> auth_time[Option<DateTime<Utc>>],
             set_nonce -> nonce[Option<Nonce>],
             set_auth_context_ref -> auth_context_ref[Option<AuthenticationContextClass>] ["acr"],
-            set_auth_method_refs -> auth_method_refs[Option<Vec<AuthenticationMethodReference>>] ["amr"],
             set_authorized_party -> authorized_party[Option<ClientId>] ["azp"],
             set_access_token_hash -> access_token_hash[Option<AccessTokenHash>] ["at_hash"],
             set_code_hash -> code_hash[Option<AuthorizationCodeHash>] ["c_hash"],
@@ -578,7 +574,6 @@ mod tests {
         assert_eq!(claims.auth_time(), None);
         assert!(claims.nonce().is_none());
         assert_eq!(claims.auth_context_ref(), None);
-        assert_eq!(claims.auth_method_refs(), None);
         assert_eq!(claims.authorized_party(), None);
         assert_eq!(claims.access_token_hash(), None);
         assert_eq!(claims.code_hash(), None);
@@ -622,7 +617,6 @@ mod tests {
                            \"auth_time\":1311282970,\
                            \"nonce\":\"Zm9vYmFy\",\
                            \"acr\":\"urn:mace:incommon:iap:silver\",\
-                           \"amr\":[\"password\",\"totp\"],\
                            \"azp\":\"dGhpc19jbGllbnQ\",\
                            \"at_hash\":\"_JPLB-GtkomFJxAOWKHPHQ\",\
                            \"c_hash\":\"VpTQii5T_8rgwxA-Wtb2Bw\",\
@@ -803,10 +797,6 @@ mod tests {
         .set_auth_context_ref(Some(AuthenticationContextClass::new(
             "urn:mace:incommon:iap:silver".to_string(),
         )))
-        .set_auth_method_refs(Some(vec![
-            AuthenticationMethodReference::new("password".to_string()),
-            AuthenticationMethodReference::new("totp".to_string()),
-        ]))
         .set_authorized_party(Some(ClientId::new("dGhpc19jbGllbnQ".to_string())))
         .set_access_token_hash(Some(AccessTokenHash::new(
             "_JPLB-GtkomFJxAOWKHPHQ".to_string(),
@@ -829,7 +819,6 @@ mod tests {
             new_claims.nonce().unwrap().secret()
         );
         assert_eq!(claims.auth_context_ref(), new_claims.auth_context_ref());
-        assert_eq!(claims.auth_method_refs(), new_claims.auth_method_refs());
         assert_eq!(claims.authorized_party(), new_claims.authorized_party());
         assert_eq!(claims.access_token_hash(), new_claims.access_token_hash());
         assert_eq!(claims.code_hash(), new_claims.code_hash());
